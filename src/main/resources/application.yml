@@ -1,0 +1,2 @@
+steam:
+  webAPIKey: ${STEAM_WEBAPI_KEY}

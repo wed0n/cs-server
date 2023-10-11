@@ -1,10 +1,13 @@
 package wed0n.csgo.server.config
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import jakarta.annotation.Resource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.web.client.RestTemplate
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.WebSocketHandler
 import org.springframework.web.socket.WebSocketMessage
@@ -14,6 +17,7 @@ import org.springframework.web.socket.config.annotation.WebSocketConfigurer
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 import org.springframework.web.util.UriComponentsBuilder
 import java.util.concurrent.ConcurrentHashMap
+
 
 @Configuration
 @EnableWebSocket
@@ -27,6 +31,12 @@ class WebSocketConfig : WebSocketConfigurer {
 
     @Bean
     fun userMap(): ConcurrentHashMap<String, String> = ConcurrentHashMap()
+
+    @Bean
+    fun objectMapper() = jacksonObjectMapper()
+
+    @Bean
+    fun restTemplate(): RestTemplate = RestTemplate()
 }
 
 class CSWebSocketHandler : WebSocketHandler {
@@ -34,6 +44,9 @@ class CSWebSocketHandler : WebSocketHandler {
 
     @Resource
     lateinit var userMap: ConcurrentHashMap<String, String>
+
+    @Resource
+    lateinit var objectMapper: ObjectMapper
 
     override fun afterConnectionEstablished(session: WebSocketSession) {
         val uri = session.uri!!
