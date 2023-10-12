@@ -1,4 +1,4 @@
-package wed0n.csgo.server
+package wed0n.cs.server
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

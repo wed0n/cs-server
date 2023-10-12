@@ -1,1 +1,1 @@
-rootProject.name = "csgo-server"
+rootProject.name = "cs-server"

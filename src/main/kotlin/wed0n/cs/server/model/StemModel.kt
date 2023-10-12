@@ -1,6 +1,7 @@
-package wed0n.csgo.server.model
+package wed0n.cs.server.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import com.fasterxml.jackson.annotation.JsonProperty
 
 data class SteamResponse<T>(
     var response: T
@@ -12,6 +13,7 @@ data class PlayerSummary(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SteamUser(
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     var steamid: Long
 ) : Comparable<SteamUser> {
     var personaname: String = ""

@@ -1,4 +1,4 @@
-package wed0n.csgo.server.model
+package wed0n.cs.server.model
 
 import org.springframework.web.socket.WebSocketSession
 

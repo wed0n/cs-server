@@ -1,4 +1,4 @@
-package wed0n.csgo.server.service
+package wed0n.cs.server.service
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -7,30 +7,37 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
 import org.springframework.web.util.UriComponentsBuilder
-import wed0n.csgo.server.model.PlayerSummary
-import wed0n.csgo.server.model.SessionModel
-import wed0n.csgo.server.model.SteamResponse
-import java.util.concurrent.ConcurrentHashMap
+import wed0n.cs.server.dto.ServerMessage
+import wed0n.cs.server.handler.RefreshUsersHandler
+import wed0n.cs.server.handler.sessionMap
+import wed0n.cs.server.model.PlayerSummary
+import wed0n.cs.server.model.SteamResponse
+import wed0n.cs.server.model.SteamUser
+import wed0n.cs.server.util.sendAll
 
-interface LoginService {
-    fun register()
+interface UserService {
+    fun broadcastLoginUsers()
+    fun refreshLoginUsers()
+    fun getAllLoinUsers(): ArrayList<SteamUser>
 }
 
 @Service
-class LoginServiceImpl : LoginService {
+class UserServiceImpl : UserService {
     @Resource
     lateinit var restTemplate: RestTemplate
 
     @Resource
     lateinit var objectMapper: ObjectMapper
 
-    @Resource
-    lateinit var sessionMap: ConcurrentHashMap<Long, SessionModel>
-
     @Value("\${steam.webAPIKey}")
     private lateinit var webAPIKey: String
+    override fun broadcastLoginUsers() {
+        val loginUsers = getAllLoinUsers()
+        val message = ServerMessage(RefreshUsersHandler.type, loginUsers)
+        sendAll(message)
+    }
 
-    override fun register() {
+    override fun refreshLoginUsers() {
         val uriComponentsBuilder =
             UriComponentsBuilder.fromUriString("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${webAPIKey}")
         //拼接steamIds
@@ -57,5 +64,16 @@ class LoginServiceImpl : LoginService {
             steamUser.personaname = item.personaname
             steamUser.avatarhash = item.avatarhash
         }
+        broadcastLoginUsers()
     }
+
+    override fun getAllLoinUsers(): ArrayList<SteamUser> {
+        val result: ArrayList<SteamUser> = ArrayList()
+        for (item in sessionMap) {
+            result.add(item.value.steamUser)
+        }
+        result.sort()
+        return result
+    }
+
 }
