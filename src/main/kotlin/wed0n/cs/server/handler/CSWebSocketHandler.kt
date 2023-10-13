@@ -86,7 +86,7 @@ class CSWebSocketHandler : TextWebSocketHandler() {
         sessionMap.remove(steamId64)
 
         userService.broadcastLoginUsers()
-        logger.info("{} {} 退出登录 {}", session, steamId64, closeStatus)
+        logger.info("退出登录 {} {}", steamId64, closeStatus)
     }
 
     override fun supportsPartialMessages(): Boolean = false
