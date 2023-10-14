@@ -48,16 +48,22 @@ class UserServiceImpl : UserService {
     var broadcastingStatus = BlockingStatus()
 
     override fun refreshLoginUsers() {
-        if (refreshingStatus.isBlocking) {
-            //如果阻塞，则标记有新的请求
-            refreshingStatus.isNew = true
-            logger.info("新登录")
-            return
+        synchronized(refreshingStatus) {
+            if (refreshingStatus.isBlocking) {
+                //如果阻塞，则标记有新的请求
+                refreshingStatus.isNew = true
+                logger.info("新登录")
+                return
+            }
+            refreshingStatus.isBlocking = true
         }
-        refreshingStatus.isBlocking = true
         do {
             logger.info("获取头像中")
-            refreshingStatus.isNew = false
+
+            synchronized(refreshingStatus) {
+                refreshingStatus.isNew = false
+            }
+
             val uriComponentsBuilder =
                 UriComponentsBuilder.fromUriString("https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=${webAPIKey}")
             //拼接steamIds
@@ -87,33 +93,52 @@ class UserServiceImpl : UserService {
                 }
             } catch (e: Throwable) {
                 //获取异常后，重试
-                refreshingStatus.isNew = true
+                synchronized(refreshingStatus) {
+                    refreshingStatus.isNew = true
+                }
             }
             broadcastLoginUsers()
-        } while (refreshingStatus.isNew)
-        refreshingStatus.isBlocking = false
+            synchronized(refreshingStatus) {
+                if (!refreshingStatus.isNew) {
+                    refreshingStatus.isBlocking = false
+                    logger.info("完成刷新用户")
+                    return
+                }
+            }
+        } while (true)
     }
 
     override fun broadcastLoginUsers() {
-        if (broadcastingStatus.isBlocking) {
-            broadcastingStatus.isNew = true
-            logger.info("新广播登录用户请求")
-            return
+        synchronized(broadcastingStatus) {
+            if (broadcastingStatus.isBlocking) {
+                broadcastingStatus.isNew = true
+                logger.info("新广播登录用户请求")
+                return
+            }
+            broadcastingStatus.isBlocking = true
         }
-        broadcastingStatus.isBlocking = true
         do {
+            synchronized(broadcastingStatus) {
+                broadcastingStatus.isNew = false
+            }
             logger.info("开始广播登录用户")
-            broadcastingStatus.isNew = false
             try {
                 val loginUsers = getAllLoinUsers()
                 val message = ServerMessage(RefreshUsersHandler.type, loginUsers)
                 sendAll(message)
             } catch (e: Throwable) {
-                broadcastingStatus.isNew = true
+                synchronized(broadcastingStatus) {
+                    broadcastingStatus.isNew = true
+                }
             }
-        } while (broadcastingStatus.isNew)
-        logger.info("完成广播登录用户")
-        broadcastingStatus.isBlocking = false
+            synchronized(broadcastingStatus) {
+                if (!broadcastingStatus.isNew) {
+                    broadcastingStatus.isBlocking = false
+                    logger.info("完成广播登录用户")
+                    return
+                }
+            }
+        } while (true)
     }
 
     override fun getAllLoinUsers(): ArrayList<SteamUser> {
