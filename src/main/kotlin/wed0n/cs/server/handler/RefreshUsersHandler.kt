@@ -14,7 +14,7 @@ class RefreshUsersHandler : MessageHandler {
     lateinit var userService: UserService
 
     companion object {
-        val type = "REFRESH_USERS"
+        const val type = "REFRESH_USERS"
     }
 
     override fun getType(): String = type

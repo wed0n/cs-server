@@ -1,2 +1,6 @@
 steam:
   webAPIKey: ${STEAM_WEBAPI_KEY}
+server:
+  ssl:
+    certificate: "classpath:private.crt"
+    certificate-private-key: "classpath:private.key"

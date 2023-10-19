@@ -144,7 +144,9 @@ class UserServiceImpl : UserService {
     override fun getAllLoinUsers(): ArrayList<SteamUser> {
         val result: ArrayList<SteamUser> = ArrayList()
         for (item in sessionMap) {
-            result.add(item.value.steamUser)
+            val steamUser = item.value.steamUser
+            if (steamUser.personaname != "")
+                result.add(item.value.steamUser)
         }
         result.sort()
         return result

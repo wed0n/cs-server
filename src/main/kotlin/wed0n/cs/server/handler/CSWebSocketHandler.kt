@@ -13,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import wed0n.cs.server.model.SessionModel
 import wed0n.cs.server.model.SteamUser
 import wed0n.cs.server.model.stemIdToSteamId64
+import wed0n.cs.server.service.ChatService
 import wed0n.cs.server.service.UserService
 import wed0n.cs.server.util.objectMapper
 import java.util.concurrent.ConcurrentHashMap
@@ -26,10 +27,13 @@ class CSWebSocketHandler : TextWebSocketHandler() {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     @Resource
-    lateinit var applicationContext: ApplicationContext
+    private lateinit var applicationContext: ApplicationContext
 
     @Resource
-    lateinit var userService: UserService
+    private lateinit var userService: UserService
+
+    @Resource
+    private lateinit var chatService: ChatService
 
     private val handlers = HashMap<String, MessageHandler>()
 
@@ -64,9 +68,9 @@ class CSWebSocketHandler : TextWebSocketHandler() {
         try {
             val jsonNode = objectMapper.readTree(message.payload)
             val type = objectMapper.convertValue(jsonNode.get("type"), String::class.java)
-            val bodyNode = jsonNode.get("data")
+            val dataNode = jsonNode.get("data")
             val handler = handlers[type]!!
-            handler.handle(session, bodyNode)
+            handler.handle(session, dataNode)
         } catch (e: Throwable) {
             e.printStackTrace()
             session.close()
@@ -80,10 +84,15 @@ class CSWebSocketHandler : TextWebSocketHandler() {
     override fun afterConnectionClosed(session: WebSocketSession, closeStatus: CloseStatus) {
         val sessionId = session.id
         val steamId64 = sessionIdToSteamIdMap[sessionId]
+        val sessionModel = sessionMap[steamId64]
 
         //断开连接后删除连接信息
         sessionIdToSteamIdMap.remove(sessionId)
         sessionMap.remove(steamId64)
+
+        if (sessionModel != null) {
+            chatService.addChatMessage(0, "${sessionModel.steamUser.personaname} 断开了连接")
+        }
 
         userService.broadcastLoginUsers()
         logger.info("退出登录 {} {}", steamId64, closeStatus)

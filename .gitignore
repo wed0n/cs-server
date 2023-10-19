@@ -6,6 +6,8 @@ src/test/
 !**/src/main/**/build/
 !**/src/test/**/build/
 gradle
+*.crt
+*.key
 
 ### STS ###
 .apt_generated
