@@ -1,9 +1,9 @@
 package wed0n.cs.server.handler
 
 import jakarta.annotation.PostConstruct
-import jakarta.annotation.Resource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.web.socket.CloseStatus
 import org.springframework.web.socket.TextMessage
@@ -26,13 +26,13 @@ val sessionIdToSteamIdMap: ConcurrentHashMap<String, Long> = ConcurrentHashMap()
 class CSWebSocketHandler : TextWebSocketHandler() {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    @Resource
+    @Autowired
     private lateinit var applicationContext: ApplicationContext
 
-    @Resource
+    @Autowired
     private lateinit var userService: UserService
 
-    @Resource
+    @Autowired
     private lateinit var chatService: ChatService
 
     private val handlers = HashMap<String, MessageHandler>()

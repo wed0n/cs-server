@@ -2,9 +2,10 @@ package wed0n.cs.server.service
 
 import com.fasterxml.jackson.core.type.TypeReference
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.annotation.Resource
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
+import org.springframework.aot.hint.annotation.RegisterReflectionForBinding
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestTemplate
@@ -29,13 +30,14 @@ data class BlockingStatus(
 )
 
 @Service
+@RegisterReflectionForBinding(SteamResponse::class, PlayerSummary::class)
 class UserServiceImpl : UserService {
     private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
-    @Resource
+    @Autowired
     lateinit var restTemplate: RestTemplate
 
-    @Resource
+    @Autowired
     lateinit var objectMapper: ObjectMapper
 
     @Value("\${steam.webAPIKey}")
@@ -92,6 +94,7 @@ class UserServiceImpl : UserService {
                     steamUser.avatarhash = item.avatarhash
                 }
             } catch (e: Throwable) {
+                e.printStackTrace()
                 //获取异常后，重试
                 synchronized(refreshingStatus) {
                     refreshingStatus.isNew = true

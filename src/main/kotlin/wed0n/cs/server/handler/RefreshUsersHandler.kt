@@ -2,6 +2,7 @@ package wed0n.cs.server.handler
 
 import com.fasterxml.jackson.databind.JsonNode
 import jakarta.annotation.Resource
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 import org.springframework.web.socket.WebSocketSession
 import wed0n.cs.server.dto.ServerMessage
@@ -10,7 +11,7 @@ import wed0n.cs.server.util.sendOne
 
 @Component
 class RefreshUsersHandler : MessageHandler {
-    @Resource
+    @Autowired
     lateinit var userService: UserService
 
     companion object {
