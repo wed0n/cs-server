@@ -1,21 +1,20 @@
 package wed0n.cs.server.model
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.annotation.JsonProperty
+import java.io.Serializable
 
 data class SteamResponse<T>(
     var response: T
-)
+) : Serializable
 
 data class PlayerSummary(
     var players: ArrayList<SteamUser>
-)
+) : Serializable
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 data class SteamUser(
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     var steamid: Long
-) : Comparable<SteamUser> {
+) : Comparable<SteamUser>, Serializable {
     var personaname: String = ""
     var avatarhash: String = ""
     override fun compareTo(other: SteamUser): Int = if (other.steamid < this.steamid) 1 else -1

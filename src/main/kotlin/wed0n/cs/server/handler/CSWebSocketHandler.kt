@@ -10,6 +10,7 @@ import org.springframework.web.socket.TextMessage
 import org.springframework.web.socket.WebSocketSession
 import org.springframework.web.socket.handler.TextWebSocketHandler
 import org.springframework.web.util.UriComponentsBuilder
+import wed0n.cs.server.model.LoginMessageModel
 import wed0n.cs.server.model.SessionModel
 import wed0n.cs.server.model.SteamUser
 import wed0n.cs.server.model.stemIdToSteamId64
@@ -60,6 +61,7 @@ class CSWebSocketHandler : TextWebSocketHandler() {
         sessionMap[steamID64] = SessionModel(session, SteamUser(steamID64))
         sessionIdToSteamIdMap[session.id] = steamID64
         logger.info("连接已建立 {}", steamID64)
+        chatService.newLoginMessage(LoginMessageModel(System.currentTimeMillis(), steamID64))
         userService.refreshLoginUsers()
     }
 
@@ -91,7 +93,9 @@ class CSWebSocketHandler : TextWebSocketHandler() {
         sessionMap.remove(steamId64)
 
         if (sessionModel != null) {
-            chatService.addChatMessage(0, "${sessionModel.steamUser.personaname} 断开了连接")
+            val name = sessionModel.steamUser.personaname
+            if (name != "")
+                chatService.addChatMessage(0, "${sessionModel.steamUser.personaname} 断开了连接")
         }
 
         userService.broadcastLoginUsers()

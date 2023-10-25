@@ -40,6 +40,9 @@ class UserServiceImpl : UserService {
     @Autowired
     lateinit var objectMapper: ObjectMapper
 
+    @Autowired
+    lateinit var chatService: ChatService
+
     @Value("\${steam.webAPIKey}")
     private lateinit var webAPIKey: String
 
@@ -96,11 +99,14 @@ class UserServiceImpl : UserService {
             } catch (e: Throwable) {
                 e.printStackTrace()
                 //获取异常后，重试
+                e.printStackTrace()
+                Thread.sleep(1000)
                 synchronized(refreshingStatus) {
                     refreshingStatus.isNew = true
                 }
             }
             broadcastLoginUsers()
+            chatService.broadcastLoginMessage()
             synchronized(refreshingStatus) {
                 if (!refreshingStatus.isNew) {
                     refreshingStatus.isBlocking = false
@@ -130,6 +136,7 @@ class UserServiceImpl : UserService {
                 val message = ServerMessage(RefreshUsersHandler.type, loginUsers)
                 sendAll(message)
             } catch (e: Throwable) {
+                e.printStackTrace()
                 synchronized(broadcastingStatus) {
                     broadcastingStatus.isNew = true
                 }

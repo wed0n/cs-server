@@ -1,7 +1,6 @@
 package wed0n.cs.server.config
 
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import jakarta.annotation.Resource
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestTemplate
