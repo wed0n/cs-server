@@ -38,7 +38,7 @@ class GetAllChatsHandler : MessageHandler {
     private lateinit var chatService: ChatService
 
     companion object {
-        const val type = "GET_ALL_CHATS"
+        const val type = "REFRESH_CHATS"
     }
 
     override fun getType(): String {

@@ -15,6 +15,7 @@ import wed0n.cs.server.model.SessionModel
 import wed0n.cs.server.model.SteamUser
 import wed0n.cs.server.model.stemIdToSteamId64
 import wed0n.cs.server.service.ChatService
+import wed0n.cs.server.service.LaunchService
 import wed0n.cs.server.service.UserService
 import wed0n.cs.server.util.objectMapper
 import java.util.concurrent.ConcurrentHashMap
@@ -35,6 +36,9 @@ class CSWebSocketHandler : TextWebSocketHandler() {
 
     @Autowired
     private lateinit var chatService: ChatService
+
+    @Autowired
+    private lateinit var launchService: LaunchService
 
     private val handlers = HashMap<String, MessageHandler>()
 
@@ -61,6 +65,7 @@ class CSWebSocketHandler : TextWebSocketHandler() {
         sessionMap[steamID64] = SessionModel(session, SteamUser(steamID64))
         sessionIdToSteamIdMap[session.id] = steamID64
         logger.info("连接已建立 {}", steamID64)
+        launchService.sendConfig(session)
         chatService.newLoginMessage(LoginMessageModel(System.currentTimeMillis(), steamID64))
         userService.refreshLoginUsers()
     }
