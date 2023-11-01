@@ -99,11 +99,11 @@ class UserServiceImpl : UserService {
             } catch (e: Throwable) {
                 e.printStackTrace()
                 //获取异常后，重试
-                e.printStackTrace()
                 Thread.sleep(1000)
                 synchronized(refreshingStatus) {
                     refreshingStatus.isNew = true
                 }
+                continue
             }
             broadcastLoginUsers()
             chatService.broadcastLoginMessage()
