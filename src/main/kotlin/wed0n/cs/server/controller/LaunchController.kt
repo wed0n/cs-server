@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RestController
+import wed0n.cs.server.model.LaunchConfigModel
 import wed0n.cs.server.service.LaunchService
+
 
 @RestController
 class LaunchController {
@@ -26,7 +28,7 @@ class LaunchController {
             logger.error("wrong key $key")
             return "key error"
         }
-        launchService.setConfig(address, csgo)
+        launchService.setConfig(LaunchConfigModel(address, csgo))
         logger.info("成功设置服务器地址为: $address")
         return "Succeed set server address to $address"
     }

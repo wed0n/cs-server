@@ -19,6 +19,10 @@ repositories {
     mavenCentral()
 }
 
+dependencyLocking {
+    lockAllConfigurations()
+}
+
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-websocket:3.1.4")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.15.2")

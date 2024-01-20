@@ -8,17 +8,16 @@ import wed0n.cs.server.util.sendAll
 import wed0n.cs.server.util.sendOne
 
 interface LaunchService {
-    fun setConfig(serverTarget: String, launchCSGO: Boolean)
+    fun setConfig(launchConfig: LaunchConfigModel)
     fun sendConfig(session: WebSocketSession)
     fun launch()
 }
 
 @Service
 class LaunchServiceImpl : LaunchService {
-    private val launchConfig = LaunchConfigModel()
-    override fun setConfig(serverTarget: String, launchCSGO: Boolean) {
-        launchConfig.address = serverTarget
-        launchConfig.csgo = launchCSGO
+    private var launchConfig = LaunchConfigModel()
+    override fun setConfig(launchConfig: LaunchConfigModel) {
+        this.launchConfig = launchConfig
         val serverMessage = ServerMessage("LAUNCH_CONFIG", launchConfig)
         sendAll(serverMessage)
     }
